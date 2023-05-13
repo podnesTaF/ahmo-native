@@ -6,6 +6,7 @@ export type DrawerParamList = {
     Login: undefined;
     Register: undefined;
     Profile: undefined;
+    Chat: undefined;
 };
 
 export type StackParamList = {

@@ -9,6 +9,7 @@ import Register from "../screens/Register";
 import React from "react";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import CustomDrawerContent from "./CustomDrawerContent";
+import Chat from "../screens/Chat";
 
 export const Drawer = createDrawerNavigator<DrawerParamList>();
 const DrawerNavigator = () => {
@@ -43,6 +44,10 @@ const DrawerNavigator = () => {
                 <Drawer.Screen name={'Home'} component={Home} options={{
                     headerTitle: 'AHMO Chat',
                     title: 'Home',
+                }} />
+                <Drawer.Screen name={'Chat'} component={Chat} options={{
+                    headerTitle: 'Chat',
+                    title: 'Chat',
                 }} />
             </>
         ) : (
