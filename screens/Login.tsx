@@ -6,6 +6,8 @@ import {useLoginUserMutation} from "../services/authService";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {FormProvider, useForm} from "react-hook-form";
 import {LoginFormSchema} from "../utils/validation";
+import {useAppDispatch} from "../hooks/useStore";
+import {setUser} from "../store/slices/userSlice";
 
 interface LoginProps {
     navigation: {
@@ -17,21 +19,40 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({navigation}) => {
     const [errorMessage, setErrorMessage] = useState("");
     const [loginUser, { isLoading, error }] = useLoginUserMutation();
-    // const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
 
     const form = useForm({
         mode: "onChange",
         resolver: yupResolver(LoginFormSchema),
+        defaultValues: {
+            email: '',
+            password: '',
+        },
     });
 
-    const onSubmit = async (dto: any) => {}
+    const onSubmit = async (dto: any) => {
+        try {
+            const res = await loginUser(dto).unwrap();
+
+            if (res) {
+                dispatch(setUser(res));
+            }
+            navigation.navigate('Home');
+        } catch (err: any) {
+            if (err.status === 401) {
+                form.setError('password', { type: 'manual', message: 'Invalid email or password' });
+            } else {
+                console.log(err);
+            }
+        }
+    }
 
     return (
         <AuthWrapper mode={'login'}>
             <FormProvider {...form}>
                    <VStack space={3} mt="5">
                        <FormField name={'email'} label={'Email ID'} bgColor={'primary.700'} variant={'filled'} />
-                       <FormField name={'password'} label={'Password'} bgColor={'primary.700'} variant={'filled'}>
+                       <FormField name={'password'} label={'Password'} bgColor={'primary.700'} type={'password'} variant={'filled'}>
                            <Link _text={{
                                fontSize: "xs",
                                fontWeight: "500",
@@ -40,7 +61,7 @@ const Login: React.FC<LoginProps> = ({navigation}) => {
                                Forget Password?
                            </Link>
                        </FormField>
-                       <Button mt="2" colorScheme="warning">
+                       <Button onPress={form.handleSubmit(onSubmit)} mt="2" colorScheme="warning">
                            Sign in
                        </Button>
                        <HStack mt="6" justifyContent="center">
