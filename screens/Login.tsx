@@ -1,5 +1,11 @@
-import React from 'react';
-import {Box, Button, Center, FormControl, Text, Heading, HStack, Input, Link, View, VStack, Image} from "native-base";
+import React, {useState} from 'react';
+import { Button,   Text,  HStack,  Link,  VStack} from "native-base";
+import FormField from "../components/auth/FormField";
+import AuthWrapper from "../components/auth/AuthWrapper";
+import {useLoginUserMutation} from "../services/authService";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {FormProvider, useForm} from "react-hook-form";
+import {LoginFormSchema} from "../utils/validation";
 
 interface LoginProps {
     navigation: {
@@ -9,58 +15,51 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({navigation}) => {
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loginUser, { isLoading, error }] = useLoginUserMutation();
+    // const dispatch = useAppDispatch();
+
+    const form = useForm({
+        mode: "onChange",
+        resolver: yupResolver(LoginFormSchema),
+    });
+
+    const onSubmit = async (dto: any) => {}
+
     return (
-        <Center w="100%" flex={1} bg='primary.700'>
-            <Box safeArea p="2" py="8" w="90%" maxW="290">
-                <HStack alignItems={'center'} mb={4}>
-                    <Image source={require('../assets/ahmo-logo.png')} alt={'logo'} size={'sm'} mr={4} />
-                    <Heading size="lg" fontWeight="600" color="coolGray.200" _dark={{
-                        color: "warmGray.50"
-                    }}>
-                        Welcome
-                    </Heading>
-                </HStack>
-                <Heading mt="1" textAlign={'center'} _dark={{
-                    color: "warmGray.200"
-                }} color="coolGray.600" fontWeight="medium" size="xs">
-                    Sign in to continue!
-                </Heading>
-                <VStack space={3} mt="5">
-                    <FormControl>
-                        <FormControl.Label>Email ID</FormControl.Label>
-                        <Input color={'gray.100'} />
-                    </FormControl>
-                    <FormControl>
-                        <FormControl.Label>Password</FormControl.Label>
-                        <Input type="password" color={'white'} />
-                        <Link _text={{
-                            fontSize: "xs",
-                            fontWeight: "500",
-                            color: "indigo.500"
-                        }} alignSelf="flex-end" mt="1">
-                            Forget Password?
-                        </Link>
-                    </FormControl>
-                    <Button mt="2" colorScheme="indigo">
-                        Sign in
-                    </Button>
-                    <HStack mt="6" justifyContent="center">
-                        <Text fontSize="sm" color="coolGray.600" _dark={{
-                            color: "warmGray.200"
-                        }}>
-                            I'm a new user.{" "}
-                        </Text>
-                        <Link onPress={() => navigation.navigate('Register')} _text={{
-                            color: "indigo.500",
-                            fontWeight: "medium",
-                            fontSize: "sm"
-                        }}>
-                            Sign Up
-                        </Link>
-                    </HStack>
-                </VStack>
-            </Box>
-        </Center>
+        <AuthWrapper mode={'login'}>
+            <FormProvider {...form}>
+                   <VStack space={3} mt="5">
+                       <FormField name={'email'} label={'Email ID'} bgColor={'primary.700'} variant={'filled'} />
+                       <FormField name={'password'} label={'Password'} bgColor={'primary.700'} variant={'filled'}>
+                           <Link _text={{
+                               fontSize: "xs",
+                               fontWeight: "500",
+                               color: "warning.500"
+                           }} alignSelf="flex-end" mt="1">
+                               Forget Password?
+                           </Link>
+                       </FormField>
+                       <Button mt="2" colorScheme="warning">
+                           Sign in
+                       </Button>
+                       <HStack mt="6" justifyContent="center">
+                           <Text fontSize="sm" color="coolGray.600" _dark={{
+                               color: "warmGray.200"
+                           }}>
+                               I'm a new user.{" "}
+                           </Text>
+                           <Link onPress={() => navigation.navigate('Register')} _text={{
+                               color: "warning.500",
+                               fontWeight: "medium",
+                               fontSize: "sm"
+                           }}>
+                               Sign Up
+                           </Link>
+                       </HStack>
+                   </VStack>
+            </FormProvider>
+        </AuthWrapper>
     );
 };
 

@@ -35,22 +35,19 @@ export const theme: ITheme = extendTheme({
         QuickSand: {
             400: {
                 normal: "Quicksand-Regular",
-                italic: "Quicksand-Italic",
             },
             500: {
               normal: "Quicksand-Medium",
-                italic: "Quicksand-MediumItalic",
             },
             700: {
                 normal: "Quicksand-Bold",
-                italic: "Quicksand-BoldItalic",
             }
         }
     },
     fonts: {
-        heading: "Quicksand",
-        body: "Quicksand",
-        mono: "Quicksand",
+        heading: "Quicksand-Bold",
+        body: "Quicksand-Medium",
+        mono: "Quicksand-Medium",
     },
     config: {
         // Changing initialColorMode to 'dark'
