@@ -1,21 +1,27 @@
 import React from 'react';
-import {Box, HStack, Text} from "native-base";
+import {HStack} from "native-base";
+import {useAppDispatch, useAppSelector} from "../../hooks/useStore";
+import {menuType, selectMenuType, setType} from "../../store/slices/menuSlice";
+import ChatTypeTab from "./ChatTypeTab";
+
+const tabs = [
+    'All',
+    'Game',
+    'Direct',
+    'Group'
+]
 
 const Tabs = () => {
+    const dispatch = useAppDispatch();
+    const selectedType = useAppSelector(selectMenuType);
+
+    const changeType = (type: any) => {
+        dispatch(setType(type));
+    }
+
     return (
         <HStack w={'100%'} justifyContent={'center'}>
-            <Box flex={1} alignItems={'center'} borderColor={'warning.500'} borderBottomWidth={'2'}>
-                <Text pb={2}>All</Text>
-            </Box>
-            <Box flex={1} alignItems={'center'}>
-                <Text pb={2}>Games</Text>
-            </Box>
-            <Box flex={1} alignItems={'center'}>
-                <Text pb={2}>Direct</Text>
-            </Box>
-            <Box flex={1} alignItems={'center'}>
-                <Text pb={2}>Groups</Text>
-            </Box>
+            {tabs.map((item, i) =>  <ChatTypeTab selectedType={selectedType} changeType={changeType} name={item} key={i} />)}
         </HStack>
     );
 };

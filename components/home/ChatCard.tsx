@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Box, Center, Heading, Pressable} from "native-base";
 import {useNavigation} from "@react-navigation/native";
 import {ImageBackground} from "react-native";
+import {IChat} from "../../models/chat";
 
 interface ChatCardProps {
     imageUri: string;
@@ -11,7 +12,6 @@ interface ChatCardProps {
 }
 
 const ChatCard:React.FC<ChatCardProps> = ({imageUri, link, title, bgColor}) => {
-    const navigation = useNavigation();
 
     return (
         <Pressable w={'100%'} my={4} alignItems={'center'}>

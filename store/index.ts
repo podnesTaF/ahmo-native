@@ -1,11 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import {api} from "../services/api";
 import userReducer from "./slices/userSlice";
+import {chatReducer} from "./slices/chatSlice";
+import {menuReducer} from "./slices/menuSlice";
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
             user: userReducer,
+            chat: chatReducer,
+            menu: menuReducer,
             [api.reducerPath]: api.reducer,
         },
         middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
