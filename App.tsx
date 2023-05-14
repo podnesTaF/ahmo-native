@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import {NativeBaseProvider} from "native-base";
+import {Heading, NativeBaseProvider} from "native-base";
 import * as Font from 'expo-font';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import {NavigationContainer} from "@react-navigation/native";
@@ -10,6 +10,8 @@ import { Provider } from 'react-redux';
 import {store} from "./store";
 import DrawerNavigator from "./navigators/DrawerNavigation";
 import {ActivityIndicator, View} from "react-native";
+import Chat from "./screens/Chat";
+import CreateChat from "./screens/CreateChat";
 
 
 const Stack = createNativeStackNavigator<StackParamList>();
@@ -50,6 +52,17 @@ export default function App() {
                  <NavigationContainer>
                      <Stack.Navigator>
                          <Stack.Screen name={'Drawer'} component={DrawerNavigator} options={{ headerShown: false}} />
+                         <Stack.Screen name={'Chat'} component={Chat} options={{
+                             headerStyle: {
+                                    backgroundColor: theme.colors.primary[700]
+                             },
+                         }} />
+                         <Stack.Screen name={'CreateChat'} component={CreateChat} options={{
+                             headerStyle: {
+                                 backgroundColor: theme.colors.primary[700]
+                             },
+                             headerTintColor: 'white'
+                         }} />
                      </Stack.Navigator>
                  </NavigationContainer>
              </NativeBaseProvider>

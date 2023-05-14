@@ -1,7 +1,7 @@
-import {DrawerNavigatorProps, DrawerParamList} from "./types/navigation";
+import {DrawerParamList} from "./types/navigation";
 import {useAppSelector} from "../hooks/useStore";
 import {selectUser} from "../store/slices/userSlice";
-import {Avatar, useTheme} from "native-base";
+import {Avatar, Icon, IconButton, useTheme} from "native-base";
 import Profile from "../screens/Profile";
 import Home from "../screens/Home";
 import Login from "../screens/Login";
@@ -9,10 +9,16 @@ import Register from "../screens/Register";
 import React from "react";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import CustomDrawerContent from "./CustomDrawerContent";
-import Chat from "../screens/Chat";
+import Menu from "../screens/Menu";
+import {Ionicons} from "@expo/vector-icons";
 
 export const Drawer = createDrawerNavigator<DrawerParamList>();
-const DrawerNavigator = () => {
+
+interface DrawerNavigatorProps {
+    navigation: any;
+}
+
+const DrawerNavigator: React.FC<DrawerNavigatorProps> = ({navigation}) => {
     const user = useAppSelector(selectUser)
     const theme = useTheme();
     return <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props}/>} screenOptions={{
@@ -42,18 +48,23 @@ const DrawerNavigator = () => {
                     }
                 }} />
                 <Drawer.Screen name={'Home'} component={Home} options={{
-                    headerTitle: 'AHMO Chat',
+                    headerTitle: 'AHMO Menu',
                     title: 'Home',
                 }} />
-                <Drawer.Screen name={'Chat'} component={Chat} options={{
-                    headerTitle: 'Chat',
-                    title: 'Chat',
+                <Drawer.Screen name={'Menu'} component={Menu} options={{
+                    headerTitle: 'Chat Menu',
+                    title: 'Chat Menu',
+                    headerRight: (props: any) =>
+                        <IconButton
+                            icon={<Icon as={Ionicons} name={'add'} size={8} color={props.tintColor} />}
+                            onPress={() => navigation.navigate('CreateChat' as any)}
+                        />
                 }} />
             </>
         ) : (
            <>
                <Drawer.Screen name={'Home'} component={Home} options={{
-                   title: 'AHMO Chat',
+                   title: 'AHMO Menu',
                }} />
                <Drawer.Screen name="Login" component={Login} options={{
                    headerStyle: {

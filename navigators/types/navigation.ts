@@ -6,11 +6,13 @@ export type DrawerParamList = {
     Login: undefined;
     Register: undefined;
     Profile: undefined;
-    Chat: undefined;
+    Menu: undefined;
 };
 
 export type StackParamList = {
     Drawer: undefined;
+    Chat: any;
+    CreateChat: any;
 };
 
 export type HomeScreenNavigationProp = DrawerNavigationProp<DrawerParamList, 'Home'>;
