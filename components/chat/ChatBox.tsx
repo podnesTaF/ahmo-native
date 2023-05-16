@@ -7,6 +7,7 @@ import {selectUser} from "../../store/slices/userSlice";
 import {isAvatarUnvisible} from "../../utils/chat-helpers";
 import {Ionicons} from "@expo/vector-icons";
 import {IChat} from "../../models/chat";
+import ChatSettings from "./ChatSettings";
 
 interface ChatBoxProps {
     data: IChat;
@@ -14,8 +15,8 @@ interface ChatBoxProps {
 }
 
 const ChatBox: React.FC<ChatBoxProps> = ({data, messages}) => {
-    const [oldData, setOldData] = useState<any>();
     const user = useAppSelector(selectUser)
+
 
     const scrollRef = useRef<any>();
 
