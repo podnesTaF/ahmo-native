@@ -1,6 +1,6 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {IMessage} from "../../models/message";
-import {Avatar, Box, FlatList, Heading, Icon, ScrollView} from "native-base";
+import {Avatar, Box, Center, FlatList, Heading, Icon, ScrollView} from "native-base";
 import Message from "./Message";
 import {useAppSelector} from "../../hooks/useStore";
 import {selectUser} from "../../store/slices/userSlice";
@@ -30,19 +30,25 @@ const ChatBox: React.FC<ChatBoxProps> = ({data, messages}) => {
         <Box flex={1} w={'100%'} px={2}>
             {user && (
                <Box mt={'auto'}>
-                   <FlatList
-                       ref={scrollRef}
-                       w={'100%'}
-                       data={messages}
-                       renderItem={(itemData: {item: IMessage, index: number}) =>
-                           <Message
-                               message={itemData.item}
-                               isMy={itemData.item.sender.id === user.id}
-                               isAvatarUnvisible={isAvatarUnvisible(user.id, itemData.item, messages, itemData.index)}
-                           />
-                       }
-                       keyExtractor={(item) => item.id.toString()}
-                   />
+                   {messages?.length ? (
+                       <FlatList
+                           ref={scrollRef}
+                           w={'100%'}
+                           data={messages}
+                           renderItem={(itemData: {item: IMessage, index: number}) =>
+                               <Message
+                                   message={itemData.item}
+                                   isMy={itemData.item.sender.id === user.id}
+                                   isAvatarUnvisible={isAvatarUnvisible(user.id, itemData.item, messages, itemData.index)}
+                               />
+                           }
+                           keyExtractor={(item) => item.id.toString()}
+                       />
+                   ) : (
+                       <Center flex={1} w={'100%'}>
+                            <Heading fontSize={20} color={'white'}>No messages yet</Heading>
+                       </Center>
+                   )}
                </Box>
             )}
         </Box>

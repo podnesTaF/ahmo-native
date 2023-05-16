@@ -36,7 +36,7 @@ const Home = () => {
                </Text>
                <Center w={'100%'} alignItems='center' justifyContent={'center'}>
                    <Heading color={'secondary.500'} size={'xl'} textAlign={'center'}> Choose Your Chat bellow</Heading>
-                   {cards.map((card, index) => (<ChatCard imageUri={card.imageUri} link={card.link} title={card.title} bgColor={card.bgColor} />))}
+                   {cards.map((card, index) => (<ChatCard key={index} imageUri={card.imageUri} link={card.link} title={card.title} bgColor={card.bgColor} />))}
                </Center>
            </Box>
        </ScrollView>

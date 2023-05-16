@@ -16,9 +16,6 @@ const Menu = () => {
     const [chats, setChats] = useState<IChat[]>([]);
     const { data, error, isLoading } = useFetchChatsQuery();
     const user = useAppSelector(selectUser);
-    const activeChat = useAppSelector(selectActiveChat);
-    const navigation = useNavigation();
-    const selectedType = useAppSelector(selectMenuType);
 
     useEffect(() => {
         if (user) {

@@ -8,6 +8,7 @@ import {useSearchUsersQuery} from "../services/authService";
 import CustomRadio from "../components/shared/CustomRadio";
 import {Ionicons} from "@expo/vector-icons";
 import {IUser} from "../models/user";
+import {useCreateGameMutation} from "../services/gameService";
 
 interface CreateChatProps {
     route: any;
@@ -33,6 +34,7 @@ const CreateChat: React.FC<CreateChatProps> = ({route, navigation}) => {
         type: "direct",
     });
     const [createGroup, chatsResult] = useCreateGroupMutation();
+    const [createGame, gameResult] = useCreateGameMutation();
 
     const handleBack = () => {
         if (activeStep > 0) {
@@ -51,16 +53,13 @@ const CreateChat: React.FC<CreateChatProps> = ({route, navigation}) => {
             }
         } else {
             if (chatType === "game") {
-                // if (!chosenGame || members.length < 1 || !name) return;
-                // await createGame({
-                //     members: [userData?.id, ...members].join(","),
-                //     game: chosenGame,
-                //     type: "game",
-                //     name,
-                // });
-                // if (gameResult.data) {
-                //     setChats((prev: IChat[]) => [...prev, chatsResult.data]);
-                // }
+                if (!chosenGame || members.length < 1 || !name) return;
+                await createGame({
+                    members: [userData?.id, ...members].join(","),
+                    game: chosenGame,
+                    type: "game",
+                    name,
+                });
             } else if (chatType === "direct") {
                 let chat;
                 if (directChats) {
@@ -78,9 +77,6 @@ const CreateChat: React.FC<CreateChatProps> = ({route, navigation}) => {
                         type: "direct",
                         members: [directMember, userData?.id].join(","),
                     });
-                    // if (chatsResult.data) {
-                    //     setChats((prev: IChat[]) => [...prev, chatsResult.data]);
-                    // }
                 }
             } else {
                 if (members.length < 1 || !name) return;
@@ -89,9 +85,6 @@ const CreateChat: React.FC<CreateChatProps> = ({route, navigation}) => {
                     name,
                     members: [userData?.id, ...members].join(","),
                 });
-                // if (chatsResult.data) {
-                //     setChats((prev: IChat[]) => [...prev, chatsResult.data]);
-                // }
             }
             navigation.navigate("Menu");
         }
@@ -106,11 +99,11 @@ const CreateChat: React.FC<CreateChatProps> = ({route, navigation}) => {
                {activeStep === 0 && (
                    <>
                        <Heading size={'lg'} color={"primary.200"} my={3}>Choose type of chat</Heading>
-                       <Radio.Group name={'chatType'} value={chatType} onChange={(nextValue: any) => {
+                       <Radio.Group name={'chatType'} onChange={(nextValue: any) => {
                            setChatType(nextValue);
                        }}>
-                           {['direct', 'group', 'game'].map((type) => (
-                               <CustomRadio value={type} label={type.toUpperCase()}/>
+                           {['direct', 'group', 'game'].map((type, i) => (
+                               <CustomRadio value={type} key={i} label={type.toUpperCase()}/>
                            ))}
                        </Radio.Group>
                    </>
@@ -174,7 +167,7 @@ const CreateChat: React.FC<CreateChatProps> = ({route, navigation}) => {
                                </Center>
                            ) : (
                                 <FlatList h={'70%'} data={data} renderItem={(itemData: {item: IUser, index: number}) => (
-                                    <CustomCheck value={itemData.item.id.toString()} label={itemData.item.fullName} setValue={() => {}}  />
+                                    <CustomCheck values={members} value={itemData.item.id.toString()} label={itemData.item.fullName} setValue={setMembers}  />
                                 )}
                                           keyExtractor={(item) => item.id.toString()}
                                 />
@@ -188,7 +181,7 @@ const CreateChat: React.FC<CreateChatProps> = ({route, navigation}) => {
                     Prev
                 </Button>
                 <Button onPress={handleNext} maxW={20} w='100%'>
-                    Next
+                    {chatsResult.isLoading ? <Spinner accessibilityLabel="Loading posts" />: activeStep < 3 ? "Next" : "Create"}
                 </Button>
             </HStack>
         </Center>

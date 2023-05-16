@@ -17,9 +17,9 @@ const Message: React.FC<MessageProps> = ({isMy, message, isAvatarUnvisible,ref})
                 {message.sender.fullName.slice(0,2)}
            </Avatar>
             <Box flexDir={'row'} borderRadius={4} bgColor={isMy ? 'primary.300' : 'primary.500'} p={3}>
-                <Text fontSize={16} color={"coolGray.50"} alignSelf={'center'} mr={4}>{message.text}</Text>
+                <Text fontSize={16} color={"coolGray.50"} mr={4}>{message.text}</Text>
                 <Spacer />
-                <Text fontSize={10} mt={2} alignSelf={'end'} color="coolGray.200">
+                <Text fontSize={10} mt={2} color="coolGray.200">
                     {format(message.createdAt)}
                 </Text>
             </Box>
