@@ -12,6 +12,7 @@ import DrawerNavigator from "./navigators/DrawerNavigation";
 import {ActivityIndicator, View} from "react-native";
 import Chat from "./screens/Chat";
 import CreateChat from "./screens/CreateChat";
+import Game from "./screens/Game";
 
 
 const Stack = createNativeStackNavigator<StackParamList>();
@@ -56,6 +57,11 @@ export default function App() {
                              headerStyle: {
                                     backgroundColor: theme.colors.primary[700]
                              },
+                         }} />
+                         <Stack.Screen name={'Game'} component={Game} options={{
+                             headerStyle: {
+                                 backgroundColor: theme.colors.primary[700],
+                             }
                          }} />
                          <Stack.Screen name={'CreateChat'} component={CreateChat} options={{
                              headerStyle: {

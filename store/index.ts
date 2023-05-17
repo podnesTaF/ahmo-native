@@ -3,6 +3,7 @@ import {api} from "../services/api";
 import userReducer from "./slices/userSlice";
 import {chatReducer} from "./slices/chatSlice";
 import {menuReducer} from "./slices/menuSlice";
+import {roundReducer} from "./slices/roundSlice";
 
 export const makeStore = () => {
     return configureStore({
@@ -10,6 +11,7 @@ export const makeStore = () => {
             user: userReducer,
             chat: chatReducer,
             menu: menuReducer,
+            round: roundReducer,
             [api.reducerPath]: api.reducer,
         },
         middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),

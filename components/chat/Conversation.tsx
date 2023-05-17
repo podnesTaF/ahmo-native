@@ -22,7 +22,7 @@ const Conversation: React.FC<ConversationProps> = ({chat}) => {
             if (chat.type === "game") {
                 dispatch(setGameChat(chat));
                 // @ts-ignore
-                navigation.navigate('Chat')
+                navigation.navigate('Game')
             } else {
                 dispatch(setActiveChat(chat));
                 // @ts-ignore

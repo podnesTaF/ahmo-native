@@ -12,6 +12,7 @@ export type DrawerParamList = {
 export type StackParamList = {
     Drawer: undefined;
     Chat: any;
+    Game: any;
     CreateChat: any;
 };
 
