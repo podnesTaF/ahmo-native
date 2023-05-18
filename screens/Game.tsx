@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect} from 'react';
-import {Avatar, Box, Heading, Icon, IconButton, Text} from "native-base";
+import {Avatar, Box, FlatList, Heading, Icon, IconButton, Text} from "native-base";
 import {Ionicons} from "@expo/vector-icons";
 import {useAppDispatch, useAppSelector} from "../hooks/useStore";
 import {selectActiveChat, setGameChat} from "../store/slices/chatSlice";
@@ -8,6 +8,9 @@ import {useGetGameQuery} from "../services/gameService";
 import {IRound} from "../models/game";
 import {socket} from "../utils/socket";
 import {setRound} from "../store/slices/roundSlice";
+import RoundData from "../components/game/RoundData";
+import GameRound from "../components/game/GameRound";
+import GameTextField from "../components/game/fields/GameTextField";
 
 interface GameProps {
     navigation: any;
@@ -27,7 +30,7 @@ const Game: React.FC<GameProps> = ({navigation}) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: () => (
-                <Box w={'90%'} flexDir={'row'} alignItems={'center'} justifyContent={'space-between'} borderBottomWidth={1} borderBottomColor={'coolGray.500'}>
+                <Box w={'90%'} flexDir={'row'} alignItems={'center'} justifyContent={'space-between'}>
                     <Box>
                         <Heading fontSize={14} color={'coolGray.500'}>{selectedGame.game}</Heading>
                         <Heading fontSize={18} color={'white'}>{selectedGame.name}</Heading>
@@ -78,8 +81,22 @@ const Game: React.FC<GameProps> = ({navigation}) => {
     }, [selectedGame.activeChat, game, dispatch]);
 
     return (
-        <Box bgColor={'primary.700'} flex={1}>
-            <Text>Game Chat</Text>
+        <Box bgColor={'primary.700'} flex={1} position={'relative'}>
+            {selectedGame.game !== "words" && (
+                <RoundData
+                    gameType={game?.game}
+                    count={game?.rounds.length}
+                />
+            )}
+            {game && <FlatList data={game.rounds} renderItem={({item}) => <GameRound
+                gameType={game.game}
+                round={item}
+            />} keyExtractor={(item) => item.id.toString()} />}
+            {game?.game === "guess a word" && (
+                <GameTextField
+                    chatId={selectedGame.activeChat}
+                />
+            )}
         </Box>
     );
 };
