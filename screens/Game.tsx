@@ -11,6 +11,8 @@ import {setRound} from "../store/slices/roundSlice";
 import RoundData from "../components/game/RoundData";
 import GameRound from "../components/game/GameRound";
 import GameTextField from "../components/game/fields/GameTextField";
+import TruthDareField from "../components/game/fields/TruthDareField";
+import WorldField from "../components/game/fields/WorldField";
 
 interface GameProps {
     navigation: any;
@@ -96,6 +98,12 @@ const Game: React.FC<GameProps> = ({navigation}) => {
                 <GameTextField
                     chatId={selectedGame.activeChat}
                 />
+            )}
+            {game?.game === "truth or dare" && (
+                <TruthDareField chatId={selectedGame.activeChat} />
+            )}
+            {game?.game === "words" && (
+                <WorldField chatId={selectedGame.activeChat} nativeRound={ game?.rounds.find((r) => r.round_status === "active")!} />
             )}
         </Box>
     );

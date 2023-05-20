@@ -11,7 +11,7 @@ interface GameInputProps {
 
 const GameInput: React.FC<GameInputProps> = ({onChangeText, value, placeholder, label}) => {
     return (
-        <FormControl w={'70%'}>
+        <FormControl w={'100%'}>
             <FormControl.Label>{label}</FormControl.Label>
             <Input
                 onChangeText={onChangeText}
@@ -20,7 +20,7 @@ const GameInput: React.FC<GameInputProps> = ({onChangeText, value, placeholder, 
                 variant={'underlined'}
                 colorScheme={'warning'}
                 _focus={{
-                    backgroundColor: "warning.700",
+                    borderColor: 'warning.500',
                 }}
                 color={"gray.100"}
                 type={"text"}

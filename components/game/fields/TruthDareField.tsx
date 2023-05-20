@@ -1,53 +1,51 @@
 import React, {useState} from 'react';
-import {IRound} from "../../../models/game";
+import {useAppDispatch, useAppSelector} from "../../../hooks/useStore";
 import {
     useCreateMoveMutation,
     useCreateRoundMutation,
     useUpdateRoundDataMutation
 } from "../../../services/roundService";
-import {useAppDispatch, useAppSelector} from "../../../hooks/useStore";
 import {selectUser} from "../../../store/slices/userSlice";
 import {addScore, selectActiveChat, selectMembers} from "../../../store/slices/chatSlice";
-import {addAttempt, addRoundData, selectActiveRound} from "../../../store/slices/roundSlice";
+import {addRoundData, selectActiveRound} from "../../../store/slices/roundSlice";
 import {socket} from "../../../utils/socket";
 import {IMember} from "../../../models/chat";
-import {Box, Button, Icon, IconButton, Stack, Text} from "native-base";
+import {Box, Button, Icon, IconButton, Text} from "native-base";
 import GameInput from "../GameInput";
-import {Ionicons} from "@expo/vector-icons";
 import {disableNotMyTurn} from "../../../utils/round-helpers";
+import {Ionicons} from "@expo/vector-icons";
 
-interface GameTextFieldProps {
+interface TruthDareFieldProps {
     chatId: number;
 }
-
-const GameTextField: React.FC<GameTextFieldProps> = ({chatId}) => {
+const TruthDareField: React.FC<TruthDareFieldProps> = ({chatId}) => {
     const [moveData, setMoveData] = useState<string>("");
-    const [moveType, setMoveType] = useState<string>("question");
-    const [roundData, setRoundData] = useState<string>("");
+    const [moveType, setMoveType] = useState<string>("answer");
+    const [roundData, setRoundData] = useState<string>("truth");
     const [createMove, { isLoading }] = useCreateMoveMutation();
-    const user = useAppSelector(selectUser)
+    const user = useAppSelector(selectUser);
     const members = useAppSelector(selectMembers);
     const activeGame = useAppSelector(selectActiveChat);
     const activeRound = useAppSelector(selectActiveRound);
     const [createRound] = useCreateRoundMutation();
-    const [updateRoundData, { error }] = useUpdateRoundDataMutation();
+    const [updateRoundData, { error, isLoading: isRoundDataLoading }] =
+        useUpdateRoundDataMutation();
     const dispatch = useAppDispatch();
 
     const sendResponse = async (answer?: string) => {
+        if (!activeRound.round_data) {
+            await updateWord();
+        }
+
         if ((answer || moveData) && (moveType || answer) && activeRound) {
             const result = await createMove({
                 move_data: moveData || answer,
-                move_type: moveType || "answer",
+                move_type: answer ? "statement" : moveType,
                 roundId: activeRound.id,
             });
             // @ts-ignore
             const move = result.data;
             if (move) {
-                let immediateAttempts = activeRound.attempt;
-                if (moveType === "statement") {
-                    dispatch(addAttempt());
-                    immediateAttempts++;
-                }
                 const receivers = activeGame.members.map((m: IMember) => m.user.id);
                 socket.emit("sendMove", {
                     id: move.id,
@@ -60,16 +58,14 @@ const GameTextField: React.FC<GameTextFieldProps> = ({chatId}) => {
                     chatId,
                     receivers,
                 });
-                if ((move.correct || immediateAttempts >= 3) && activeRound?.riddler) {
+                if (answer && activeRound?.riddler) {
                     let winner;
                     if (move.correct) {
                         winner = move.player.id;
                         dispatch(addScore({ winner: move.player.id }));
-                        // activateAlert("success", "You won this round!");
                     } else {
                         winner = activeRound.riddler.id;
                         dispatch(addScore({ winner: activeRound.riddler.id }));
-                        // activateAlert("warning", "You lost this round(");
                     }
                     const newRiddler = members.find(
                         (m: IMember) => m.user.id !== activeRound?.riddler?.id
@@ -94,9 +90,9 @@ const GameTextField: React.FC<GameTextFieldProps> = ({chatId}) => {
                 }
             }
         }
-        setMoveType("question");
+        setMoveType("answer");
         setMoveData("");
-        setRoundData("");
+        setRoundData("truth");
     };
 
     const updateWord = async () => {
@@ -117,68 +113,49 @@ const GameTextField: React.FC<GameTextFieldProps> = ({chatId}) => {
         }
     };
 
-    const moveTypeHandler = (type: string) => {
-        setMoveType(type);
-    }
-
-    if (activeRound.submiting < 2) {
-        return null;
-    }
-
     return (
         <Box w={'100%'} p={3} pb={4} justifyContent={'center'}>
             {user && activeRound ? (
                 activeRound?.riddler?.id === user.id ? (
-                    activeRound.round_data ? (
+                    !activeRound.round_data && (
                         <Box w={'100%'}>
-                            <Button
-                                flex={1}
-                                isLoading={isLoading}
-                                onPress={() => sendResponse("yes")}
-                            >
-                                Yes
-                            </Button>
-                            <Button
-                                flex={1}
-                                isLoading={isLoading}
-                                onPress={() => sendResponse("no")}
-                            >
-                                No
-                            </Button>
-                        </Box>
-                    ) : (
-                        <Box flexDir={'row'} position={'relative'} justifyContent={'space-between'} alignItems={'center'}>
-                            <GameInput placeholder={'riddle a word'} label={'Riddle a word'} value={roundData}
-                                        onChangeText={(text) => setRoundData(text)} />
-                            <IconButton onPress={updateWord} position={'absolute'} right={4} top={'30%'} disabled={isLoading} icon={<Icon as={Ionicons} name={'send-outline'} size={'lg'} colorScheme={'danger'} />} mx={4} />
+                            <Box flexDir={'row'} position={'relative'} justifyContent={'space-between'} alignItems={'center'} mb={2}>
+                                <GameInput placeholder={'make your move'} label={'Answer'} value={moveData} onChangeText={(text) => setMoveData(text)} />
+                                {!isLoading && !disableNotMyTurn(activeRound, user) && (
+                                    <IconButton
+                                        onPress={() => sendResponse()}
+                                        position={'absolute'} right={4} top={'30%'} disabled={isLoading}
+                                        icon={<Icon as={Ionicons} name={'send-outline'} size={'lg'}
+                                                    colorScheme={'danger'} />} mx={4} />
+                                )}
+                            </Box>
+                            <Button.Group my={3} flexDir={'row'} justifyContent={'center'} alignItems={'center'} space={4} w={'100%'}>
+                                <Button flex={1} colorScheme={'warning'} variant={roundData === 'truth' ? 'solid' : 'outline'} onPress={() => setRoundData('truth')}>
+                                    truth
+                                </Button>
+                                <Button flex={1} colorScheme={'warning'} variant={roundData === 'dare' ? 'solid' : 'outline'} onPress={() => setRoundData('dare')}>
+                                    dare
+                                </Button>
+                            </Button.Group>
                         </Box>
                     )
-                ): (
-                    <Box w={'100%'}>
-                        <Box flexDir={'row'} position={'relative'} justifyContent={'space-between'} alignItems={'center'} mb={2}>
-                            <GameInput placeholder={'make your move'} label={'Answer'} value={moveData} onChangeText={(text) => setMoveData(text)} />
-                            {!isLoading && !disableNotMyTurn(activeRound, user) && (
-                                <IconButton
-                                    onPress={() => sendResponse()}
-                                    position={'absolute'} right={4} top={'30%'} disabled={isLoading}
-                                    icon={<Icon as={Ionicons} name={'send-outline'} size={'lg'}
-                                                colorScheme={'danger'} />} mx={4} />
-                            )}
-                        </Box>
-                        <Button.Group my={3} flexDir={'row'} justifyContent={'center'} alignItems={'center'} space={4} w={'100%'}>
-                            <Button flex={1} colorScheme={'warning'} variant={moveType === 'statement' ? 'solid' : 'outline'} onPress={() => moveTypeHandler('statement')}>
-                                statement
+            ) : (
+                    activeRound.round_data && (
+                        <Button.Group isDisabled={isRoundDataLoading || disableNotMyTurn(activeRound, user)} my={3} flexDir={'row'} justifyContent={'center'} alignItems={'center'} space={4} w={'100%'}>
+                            <Button flex={1} colorScheme={'warning'} variant={roundData === 'truth' ? 'solid' : 'outline'} onPress={() => sendResponse('truth')}>
+                                truth
                             </Button>
-                            <Button flex={1} colorScheme={'warning'} variant={moveType === 'question' ? 'solid' : 'outline'} onPress={() => moveTypeHandler('question')}>
-                                question
+                            <Button flex={1} colorScheme={'warning'} variant={roundData === 'dare' ? 'solid' : 'outline'} onPress={() => sendResponse('dare')}>
+                                dare
                             </Button>
                         </Button.Group>
-                    </Box>
+                    )
                 )
-                ): <Text>unathorized</Text>
-            }
+            ) : (
+                <Text>unathorized</Text>
+            )}
         </Box>
     );
 };
 
-export default GameTextField;
+export default TruthDareField;
