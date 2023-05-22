@@ -22,3 +22,23 @@ export const RegisterSchema = yup.object().shape({
         .required("password is required"),
     fullName: yup.string().required("Please provide your full name"),
 });
+
+
+export const ChangePasswordSchema = yup.object({
+    oldPassword: yup.string().required("Old Password is required"),
+    newPassword: yup
+        .string()
+        .required("New Password is required")
+        .min(6, "New Password must be at least 6 characters long"),
+    confirmNewPassword: yup
+        .string()
+        .required("Confirm New Password is required")
+        .oneOf([yup.ref("newPassword")], "Passwords must match"),
+});
+
+
+export const isEmail = (input: string) => {
+    let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailPattern.test(input);
+}

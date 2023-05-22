@@ -1,5 +1,5 @@
 import {IUser} from "../../models/user";
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
 export interface UserState {
     data?: IUser | null;
@@ -21,11 +21,30 @@ export const userSlice = createSlice({
         removeUser: (state) => {
             state.data = null;
             state.isAuth = false;
-        }
+        },
+        updateUserData: (
+            state,
+            action: PayloadAction<{
+                fullName?: string;
+                image_url?: string;
+                bio?: string;
+            }>
+        ) => {
+            const { fullName, image_url, bio } = action.payload;
+            if (state.data) {
+                if (fullName) {
+                    state.data.fullName = fullName;
+                } else if (image_url) {
+                    state.data.image_url = image_url;
+                } else if (bio) {
+                    state.data.bio = bio;
+                }
+            }
+        },
     }
 })
 
-export const {setUser, removeUser} = userSlice.actions;
+export const {setUser, removeUser, updateUserData} = userSlice.actions;
 export const selectUser = (state: { user: UserState }) => state.user.data;
 
 export default userSlice.reducer;

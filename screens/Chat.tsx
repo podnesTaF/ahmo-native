@@ -28,7 +28,7 @@ const Chat: React.FC<ChatProps> = ({navigation, route}) => {
         navigation.setOptions({
             headerTitle: () => (
                 <Box flexDir={'row'} alignItems={'center'}>
-                    <Avatar size={8} source={{uri: activeChat.imageUri}} mr={2}>{activeChat.name.slice(0,2)}</Avatar>
+                    <Avatar size={8} source={{uri: activeChat.image_url}} mr={2}>{activeChat.name.slice(0,2)}</Avatar>
                     <Heading fontSize={20}>{activeChat.name}</Heading>
                 </Box>
             ),

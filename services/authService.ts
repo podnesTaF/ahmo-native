@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {api} from "./api";
 import {IUser, ResponseUser} from "../models/user";
+import {ChangePasswordSchema} from "../utils/validation";
 
 
 interface RegisterUserRequest {
@@ -22,6 +23,13 @@ const storeToken = async (token: string) => {
         console.log('Error storing token:', error);
     }
 };
+
+export interface ChangePasswordFormData {
+    oldPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+}
+
 
 export const authApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -63,6 +71,32 @@ export const authApi = api.injectEndpoints({
                         : `/chats?query=${query}&type=${type}`,
             }),
         }),
+        updateUser: builder.mutation<
+            void,
+            {
+                userId: number;
+                body: { image_url?: string; fullName?: string; bio?: string, email?: string };
+            }
+        >({
+            query: ({ userId, body }) => ({
+                url: `/users/${userId}`,
+                method: "PATCH",
+                body,
+            }),
+        }),
+        updateUserPassword: builder.mutation<
+            void,
+            {
+                userId: number;
+                body: ChangePasswordFormData;
+            }
+        >({
+            query: ({ userId, body }) => ({
+                url: `/users/${userId}?passwd=true`,
+                method: "PATCH",
+                body,
+            }),
+        }),
         getProfile: builder.query<IUser, number>({
             query: (userId) => ({
                 url: `/users/${userId}`,
@@ -77,5 +111,7 @@ export const {
     useRegisterUserMutation,
     useGetUserQuery,
     useSearchUsersQuery,
+    useUpdateUserMutation,
+    useUpdateUserPasswordMutation,
     useGetProfileQuery
 } = authApi;

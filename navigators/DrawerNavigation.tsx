@@ -45,7 +45,7 @@ const DrawerNavigator: React.FC<DrawerNavigatorProps> = ({navigation}) => {
                     drawerItemStyle: {
                         borderBottomWidth: 1,
                         borderBottomColor: theme.colors.secondary[500],
-                    }
+                    },
                 }} />
                 <Drawer.Screen name={'Home'} component={Home} options={{
                     headerTitle: 'AHMO Menu',
