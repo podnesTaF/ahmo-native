@@ -17,8 +17,9 @@ import {Ionicons} from "@expo/vector-icons";
 
 interface TruthDareFieldProps {
     chatId: number;
+    activateAlert: Function
 }
-const TruthDareField: React.FC<TruthDareFieldProps> = ({chatId}) => {
+const TruthDareField: React.FC<TruthDareFieldProps> = ({chatId, activateAlert}) => {
     const [moveData, setMoveData] = useState<string>("");
     const [moveType, setMoveType] = useState<string>("answer");
     const [roundData, setRoundData] = useState<string>("truth");
@@ -63,9 +64,11 @@ const TruthDareField: React.FC<TruthDareFieldProps> = ({chatId}) => {
                     if (move.correct) {
                         winner = move.player.id;
                         dispatch(addScore({ winner: move.player.id }));
+                        activateAlert("success", "You won this round");
                     } else {
                         winner = activeRound.riddler.id;
                         dispatch(addScore({ winner: activeRound.riddler.id }));
+                        activateAlert("warning", "You lost this round");
                     }
                     const newRiddler = members.find(
                         (m: IMember) => m.user.id !== activeRound?.riddler?.id

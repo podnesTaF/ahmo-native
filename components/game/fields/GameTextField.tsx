@@ -18,9 +18,10 @@ import {disableNotMyTurn} from "../../../utils/round-helpers";
 
 interface GameTextFieldProps {
     chatId: number;
+    activateAlert: Function
 }
 
-const GameTextField: React.FC<GameTextFieldProps> = ({chatId}) => {
+const GameTextField: React.FC<GameTextFieldProps> = ({chatId, activateAlert}) => {
     const [moveData, setMoveData] = useState<string>("");
     const [moveType, setMoveType] = useState<string>("question");
     const [roundData, setRoundData] = useState<string>("");
@@ -65,11 +66,11 @@ const GameTextField: React.FC<GameTextFieldProps> = ({chatId}) => {
                     if (move.correct) {
                         winner = move.player.id;
                         dispatch(addScore({ winner: move.player.id }));
-                        // activateAlert("success", "You won this round!");
+                        activateAlert("success", "You won this round!");
                     } else {
                         winner = activeRound.riddler.id;
                         dispatch(addScore({ winner: activeRound.riddler.id }));
-                        // activateAlert("warning", "You lost this round(");
+                        activateAlert("warning", "You lost this round(");
                     }
                     const newRiddler = members.find(
                         (m: IMember) => m.user.id !== activeRound?.riddler?.id

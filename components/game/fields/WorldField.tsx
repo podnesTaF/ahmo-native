@@ -14,9 +14,10 @@ import {Ionicons} from "@expo/vector-icons";
 interface WordsTextFieldProps {
     chatId: number;
     nativeRound: IRound;
+    activateAlert: Function
 }
 
-const WorldField: React.FC<WordsTextFieldProps>  = ({chatId, nativeRound}) => {
+const WorldField: React.FC<WordsTextFieldProps>  = ({chatId, nativeRound, activateAlert}) => {
     const [moveData, setMoveData] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState("");
     const user = useAppSelector(selectUser);
@@ -56,6 +57,7 @@ const WorldField: React.FC<WordsTextFieldProps>  = ({chatId, nativeRound}) => {
                 setMoveData("");
             } else {
                 setErrorMessage(move?.error);
+                activateAlert("error", move?.error);
             }
         }
     };

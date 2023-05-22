@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useState} from 'react';
 import {Avatar, Box, FlatList, Heading, Icon, IconButton, Text} from "native-base";
 import {Ionicons} from "@expo/vector-icons";
 import {useAppDispatch, useAppSelector} from "../hooks/useStore";
@@ -13,12 +13,16 @@ import GameRound from "../components/game/GameRound";
 import GameTextField from "../components/game/fields/GameTextField";
 import TruthDareField from "../components/game/fields/TruthDareField";
 import WorldField from "../components/game/fields/WorldField";
+import StatusAlert from "../components/game/StatusAlert";
 
 interface GameProps {
     navigation: any;
 }
 
 const Game: React.FC<GameProps> = ({navigation}) => {
+    const [open, setOpen] = useState(true);
+    const [alertContent, setAlertContent] = useState("");
+    const [alertStatus, setAlertStatus] = useState<any>("info");
     const selectedGame = useAppSelector(selectActiveChat)
     const user = useAppSelector(selectUser)
     const {
@@ -82,28 +86,65 @@ const Game: React.FC<GameProps> = ({navigation}) => {
         }
     }, [selectedGame.activeChat, game, dispatch]);
 
+    useEffect(() => {
+        setAlertStatus("info");
+        setOpen(true);
+    }, [selectedGame.activeChat]);
+
+    const getAlertContent = useCallback(
+        (content: string) => {
+            if (!alertContent) {
+                setAlertContent(content);
+            }
+        },
+        [alertContent]
+    );
+
+
+    const activateAlert = (severity: any, content: string) => {
+        setAlertStatus(severity);
+        setAlertContent(content);
+        setOpen(true);
+    };
+
     return (
         <Box bgColor={'primary.700'} flex={1} position={'relative'}>
+           <Box position={'absolute'} w={'100%'} zIndex={10}>
+               <StatusAlert
+                   setAlertContent={setAlertContent}
+                   open={!!(open && alertContent)}
+                   setOpen={setOpen}
+                   status={alertStatus}
+               >
+                   {alertContent}
+               </StatusAlert>
+           </Box>
             {selectedGame.game !== "words" && (
                 <RoundData
+                    getAlertContent={getAlertContent}
                     gameType={game?.game}
                     count={game?.rounds.length}
                 />
             )}
-            {game && <FlatList data={game.rounds} renderItem={({item}) => <GameRound
-                gameType={game.game}
-                round={item}
-            />} keyExtractor={(item) => item.id.toString()} />}
+            {game &&  (
+               <>
+                   <FlatList data={game.rounds} renderItem={({item}) => <GameRound
+                       gameType={game.game}
+                       round={item}
+                   />} keyExtractor={(item) => item.id.toString()} />
+               </>
+            )}
             {game?.game === "guess a word" && (
                 <GameTextField
+                    activateAlert={activateAlert}
                     chatId={selectedGame.activeChat}
                 />
             )}
             {game?.game === "truth or dare" && (
-                <TruthDareField chatId={selectedGame.activeChat} />
+                <TruthDareField  activateAlert={activateAlert} chatId={selectedGame.activeChat} />
             )}
             {game?.game === "words" && (
-                <WorldField chatId={selectedGame.activeChat} nativeRound={ game?.rounds.find((r) => r.round_status === "active")!} />
+                <WorldField  activateAlert={activateAlert} chatId={selectedGame.activeChat} nativeRound={ game?.rounds.find((r) => r.round_status === "active")!} />
             )}
         </Box>
     );

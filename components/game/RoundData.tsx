@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useAppSelector} from "../../hooks/useStore";
 import {selectUser} from "../../store/slices/userSlice";
 import {selectActiveRound} from "../../store/slices/roundSlice";
@@ -9,14 +9,23 @@ import {getGuesser, getStatusForCurrentUser} from "../../utils/round-helpers";
 interface RoundDataProps {
     count?: number;
     gameType?: string | null;
+    getAlertContent: Function
 }
 
-const RoundData: React.FC<RoundDataProps> = ({count, gameType}) => {
+const RoundData: React.FC<RoundDataProps> = ({count, gameType, getAlertContent}) => {
     const user = useAppSelector(selectUser)
     const activeRound = useAppSelector(selectActiveRound)
     const members = useAppSelector(selectMembers);
+
+    useEffect(() => {
+        if (activeRound.id && user && gameType) {
+            const content = getStatusForCurrentUser(activeRound, user, gameType);
+            getAlertContent(content);
+        }
+    }, [user, activeRound, gameType, getAlertContent]);
+
     return (
-        <Box bgColor={'primary.500'} position={'absolute'} top={0} left={0} w={'100%'} p={3} zIndex={2}>
+        <Box bgColor={'primary.500'} position={'absolute'} left={0} w={'100%'} p={3} zIndex={2}>
             <Box flexDir={'row'} justifyContent={'space-between'}>
                 <Heading mb={2} fontSize={18} color={'coolGray.200'} fontWeight={'bold'}>Round {count}</Heading>
                 <Box flexDir={'row'}>
